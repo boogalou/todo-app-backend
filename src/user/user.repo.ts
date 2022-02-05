@@ -23,8 +23,13 @@ export class UserRepo implements IUserRepo {
     return newUser;
   }
 
-  async find(email: string): Promise<IUserModel | null> {
-    const result = await this.model.findOne({ email });
+  async find(query: string): Promise<IUserModel | null> {
+    const result = await this.model.findOne({email: query } );
+    return result;
+  }
+
+  async findById(id: string): Promise<IUserModel | null> {
+    const result = await this.model.findById({id: id });
     return result;
   }
 }

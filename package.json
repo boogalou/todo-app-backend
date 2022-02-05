@@ -2,10 +2,16 @@
   "name": "todo-app-server",
   "version": "1.0.0",
   "main": "index.js",
+  "type": "commonjs",
   "license": "MIT",
   "scripts": {
-    "start": "node ./dist/src/main.js",
+    "start": "node ./dist/main.js",
     "dev": "nodemon",
+    "dev:inspect": "nodemon -e ts,json --exec node --inspect=localhost:9222 -r ts-node/register src/main.ts",
+    "lint": "eslint ./src/**",
+    "test": "jest",
+    "test:e2e": "jest --config jest.e2e.config.ts --coverage",
+    "lint:fix": "eslint ./src/** --fix",
     "build": "tsc"
   },
   "dependencies": {

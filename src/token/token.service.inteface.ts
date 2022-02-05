@@ -1,7 +1,10 @@
+import { UserEntity } from '../user/user.entity';
+
 export interface ITokenService {
 
-  generateToken: ({ email, name }: Record<string, string>) => Tokens;
-  saveToken: (email: string, refreshToken: string) => void;
+  generateToken: (payload: UserEntity) => Tokens;
+  saveToken: (userID: string, refreshToken: string) => void;
+  removeToken: (refreshToken: string) => Promise<boolean>
 }
 
 export type Tokens = {

@@ -8,4 +8,5 @@ export const TYPES = {
   DatabaseService: Symbol.for('DatabaseMongoService'),
   UserRepo: Symbol.for('UserRepo'),
   TokenService: Symbol.for('TokenService'),
+  TokenRepo: Symbol.for('TokenRepo'),
 };

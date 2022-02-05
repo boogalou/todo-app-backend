@@ -2,17 +2,26 @@ import { compare, hash } from 'bcryptjs';
 
 export class UserEntity {
   private _password: string;
+  private _isActivated: boolean;
+  private _id: string;
+  private _refreshToken: string;
 
   constructor(
-    private readonly _email: string,
     private readonly _name: string,
+    private readonly _email: string,
+
+
+
     passwordHash?: string,
-    private readonly _isActivated?: boolean,
-    private readonly _activationLink? : string,
+
   ) {
     if (passwordHash) {
       this._password = passwordHash;
     }
+  }
+
+  get id (): string {
+    return this._id;
   }
 
   get email(): string {
@@ -27,12 +36,16 @@ export class UserEntity {
     return this._password;
   }
 
-  get activationLink(): string {
-    return this._activationLink!;
+  get isActivated(): boolean {
+    return this._isActivated;
   }
 
-  get isActivated(): boolean {
-    return this._isActivated!;
+  get refreshToken(): string  {
+    return this._refreshToken;
+  }
+
+  public setActivated() {
+    this._isActivated = this._isActivated!
   }
 
   public async setPassword(pass: string, salt: number): Promise<void> {

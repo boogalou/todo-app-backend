@@ -14,9 +14,11 @@ import { IConfigService } from './config/config.iterface';
 import { ConfigService } from './config/config.service';
 import { DatabaseService } from './Database/database.service';
 import { IUserRepo } from './user/user.repository.interface';
-import { UserRepo } from './user/userRepo';
+import { UserRepo } from './user/user.repo';
 import { TokenService } from './token/token.service';
 import { ITokenService } from './token/token.service.inteface';
+import { ITokenRepo } from './token/token.repo.interface';
+import { TokenRepo } from './token/token.repo';
 
 export const appBindingsContainer = new ContainerModule((bind: interfaces.Bind) => {
   bind<ILogger>(TYPES.ILogger).to(LoggerService).inSingletonScope();
@@ -27,6 +29,7 @@ export const appBindingsContainer = new ContainerModule((bind: interfaces.Bind) 
   bind<DatabaseService>(TYPES.DatabaseService).to(DatabaseService).inSingletonScope();
   bind<IUserRepo>(TYPES.UserRepo).to(UserRepo).inSingletonScope()
   bind<ITokenService>(TYPES.TokenService).to(TokenService).inSingletonScope()
+  bind<ITokenRepo>(TYPES.TokenRepo).to(TokenRepo).inSingletonScope()
 
 
   bind<App>(TYPES.Application).to(App);

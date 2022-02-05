@@ -48,22 +48,28 @@ export class UserController extends BaseController implements IUserController {
 
   public async registration(req: Request<{}, {}, UserRegistrationDto>, res: Response, next: NextFunction): Promise<void> {
     const {name, email, password} = req.body;
-    const user = await this.userService.registration({name, email, password});
+    debugger
+    const user = await this.userService.registration({ name, email, password });
+    res.cookie('refreshToken', user?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
     if (!user) {
-      return next(new HttpError(401, 'Пользователь с таким email уже существует'))
+      return next(new HttpError(401, 'Пользователь с таким email уже существует'));
     }
     this.send(res, 200, user);
   }
 
   public async login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction) {
     const {email, password} = req.body;
-    const user = await this.userService.login({email, password});
-    if (!user) {
-      return next(new HttpError(401, 'Пользователь с таким email не найден'))
+
+    const loginData = await this.userService.login({email, password});
+    res.cookie('refreshToken', loginData?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+    return res.json(loginData);
+    if (!loginData) {
+      return next(new HttpError(401, 'Пользователь с таким email не найден'));
     }
   }
 
-  public async logout() {
+  public async logout(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction) {
+
   }
 
   public async activate() {
