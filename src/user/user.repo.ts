@@ -24,8 +24,13 @@ export class UserRepo implements IUserRepo {
   }
 
   async find(query: string): Promise<IUserModel | null> {
-    const result = await this.model.findOne({email: query } );
+    const result = await this.model.findOne({ email: query } );
     return result;
+  }
+
+  async findLink(activateLink: string): Promise<IUserModel | null> {
+    const response = await this.model.findOne({activateLink});
+    return  response
   }
 
   async findById(id: string): Promise<IUserModel | null> {

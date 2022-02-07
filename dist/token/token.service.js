@@ -37,9 +37,20 @@ let TokenService = class TokenService {
         const refreshToken = (0, jsonwebtoken_1.sign)({ name, email }, this.configService.get('JWT_REFRESH'));
         return { accessToken, refreshToken };
     }
-    saveToken(id, refreshToken) {
+    saveToken(userID, refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield this.tokenRepo.find(id, refreshToken);
+            const tokenData = yield this.tokenRepo.find(userID);
+            if (tokenData) {
+                tokenData.refreshToken = refreshToken;
+                yield tokenData.save();
+            }
+            const token = yield this.tokenRepo.create(userID, refreshToken);
+        });
+    }
+    removeToken(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokenData = yield this.tokenRepo.removeToken(refreshToken);
+            return tokenData;
         });
     }
 };

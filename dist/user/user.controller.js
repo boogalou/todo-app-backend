@@ -62,8 +62,9 @@ let UserController = class UserController extends base_controller_1.BaseControll
     registration(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             const { name, email, password } = req.body;
-            console.log(name, email, password);
+            debugger;
             const user = yield this.userService.registration({ name, email, password });
+            res.cookie('refreshToken', user === null || user === void 0 ? void 0 : user.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             if (!user) {
                 return next(new http_error_1.HttpError(401, 'Пользователь с таким email уже существует'));
             }
@@ -74,7 +75,6 @@ let UserController = class UserController extends base_controller_1.BaseControll
         return __awaiter(this, void 0, void 0, function* () {
             const { email, password } = req.body;
             const loginData = yield this.userService.login({ email, password });
-            console.log('loginData cpmtroller:', loginData);
             res.cookie('refreshToken', loginData === null || loginData === void 0 ? void 0 : loginData.refreshToken, { maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true });
             return res.json(loginData);
             if (!loginData) {
@@ -84,6 +84,11 @@ let UserController = class UserController extends base_controller_1.BaseControll
     }
     logout(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
+            debugger;
+            const { refreshToken } = req.cookies;
+            const token = yield this.userService.logout(refreshToken);
+            res.clearCookie('refreshToken');
+            this.send(res, 200, token);
         });
     }
     activate() {

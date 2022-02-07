@@ -35,26 +35,24 @@ let UserService = class UserService {
     registration({ name, email, password }) {
         return __awaiter(this, void 0, void 0, function* () {
             const newUser = new user_entity_1.UserEntity(name, email);
+            debugger;
             const salt = this.configService.get('SALT');
             yield newUser.setPassword(password, Number(salt));
             const existUser = yield this.userRepository.find(email);
+            debugger;
             if (existUser) {
                 return null;
             }
             else {
                 const createdUser = yield this.userRepository.create(newUser);
-                console.log('registration:', createdUser);
                 const tokens = this.tokenService.generateToken(newUser);
-                console.log('createdUser.id:', createdUser.id);
-                const res = yield this.tokenService.saveToken(createdUser.id, tokens.refreshToken);
-                console.log('registration res:', res);
-                return newUser;
+                yield this.tokenService.saveToken(createdUser.id, tokens.refreshToken);
+                return Object.assign(Object.assign({}, tokens), { user: newUser });
             }
         });
     }
     login({ email, password }) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log(email);
             const user = yield this.userRepository.find(email);
             if (!user)
                 return null;
@@ -63,16 +61,14 @@ let UserService = class UserService {
             if (!result)
                 return null;
             const tokens = this.tokenService.generateToken(newUser);
-            console.log('tokens:', tokens);
-            console.log('ID', user.id);
-            console.log('tokens.refreshToken', tokens.refreshToken);
-            const res = yield this.tokenService.saveToken(user.id, tokens.refreshToken);
-            return newUser;
+            yield this.tokenService.saveToken(user.id, tokens.refreshToken);
+            return Object.assign(Object.assign({}, tokens), { user: newUser });
         });
     }
-    logout() {
+    logout(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            return true;
+            const token = this.tokenService.removeToken(refreshToken);
+            return token;
         });
     }
     activate(link) {

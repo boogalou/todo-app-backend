@@ -28,14 +28,22 @@ let TokenRepo = class TokenRepo {
     constructor() {
         this.model = token_model_1.default;
     }
-    find(userID, refreshToken) {
+    create(userID, refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            console.log('TokenRepo:', userID);
+            const token = yield this.model.create({ userID, refreshToken });
+            return token;
+        });
+    }
+    find(userID) {
+        return __awaiter(this, void 0, void 0, function* () {
             const tokenData = yield this.model.findOne({ id: userID });
-            if (tokenData) {
-                tokenData.refreshToken = refreshToken;
-                tokenData.save();
-            }
+            return tokenData;
+        });
+    }
+    removeToken(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokenData = yield this.model.deleteOne({ refreshToken });
+            return !!tokenData;
         });
     }
 };

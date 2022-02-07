@@ -10,12 +10,15 @@ import { UserRegistrationDto } from './dto/user-registration.dto';
 import { IUserService } from './user.service.interface';
 import { UserLoginDto } from './dto/user-login.dto';
 import { HttpError } from '../errors/http-error';
+import { IConfigService } from '../config/config.iterface';
+import { ValidateMiddleware } from '../common/validate.middleware';
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
   constructor(
     @inject(TYPES.ILogger) private readonly loggerService: ILogger,
     @inject(TYPES.UserService) private readonly userService: IUserService,
+    @inject(TYPES.ConfigService) private readonly configService: IConfigService,
   ) {
     super(loggerService);
     this.bindRoutes([
@@ -23,13 +26,13 @@ export class UserController extends BaseController implements IUserController {
         path: '/registration',
         method: 'post',
         func: this.registration,
-        middlewares: []
+        middlewares:  [new ValidateMiddleware(UserRegistrationDto)],
       },
       {
         path: '/login',
         method: 'post',
         func: this.login,
-        middlewares: [],
+        middlewares:  [new ValidateMiddleware(UserLoginDto)],
       },
       {
         path: '/logout',
@@ -39,7 +42,7 @@ export class UserController extends BaseController implements IUserController {
       },
       {
         path: '/activate/:link',
-        method: 'post',
+        method: 'get',
         func: this.activate,
         middlewares: [],
       },
@@ -68,13 +71,41 @@ export class UserController extends BaseController implements IUserController {
     }
   }
 
-  public async logout(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction) {
-
+  public async logout({ cookies }: Request<{}, {}>, res: Response, next: NextFunction) {
+    const {refreshToken} = cookies;
+    const  token = await this.userService.logout(refreshToken);
+    console.log(token);
+    res.clearCookie('refreshToken');
+    return this.ok(res, 200, );
   }
 
-  public async activate() {
+  public async refresh(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {refreshToken} = req.cookies;
+      const tokenData = await this.userService.refreshToken(refreshToken);
+      if (!tokenData) {
+        return null
+      }
+
+      res.cookie('refreshToken', tokenData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+      return this.send(res, 201, refreshToken)
+
+    } catch (err) {
+      next(err)
+    }
   }
 
-  public async refresh() {
+  public async activate(req: Request, res: Response, next: NextFunction) {
+    try {
+      const activateLink = req.params.link;
+      const response = await this.userService.activate(activateLink);
+      const redirectLink = this.configService.get('CLIENT_URL');
+      res.redirect(redirectLink)
+    } catch (err) {
+      console.log(err);
+    }
   }
+
+
+
 }

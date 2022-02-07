@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import { json } from 'body-parser';
+import cookieParser from 'cookie-parser';
 import { Server } from 'http';
 import { inject, injectable } from 'inversify';
 import 'reflect-metadata';
@@ -9,6 +10,7 @@ import { IExceptionFilter } from './errors/exception.filter.interface';
 import { UserController } from './user/user.controller';
 import { DatabaseService } from './Database/database.service';
 import { ConfigService } from './config/config.service';
+import { AuthMiddleware } from './common/auth.middleware';
 
 @injectable()
 export class App {
@@ -29,7 +31,10 @@ export class App {
   }
 
   useMiddleware(): void {
-    this.app.use(json())
+    this.app.use(json());
+    this.app.use(cookieParser());
+    const authMiddleware = new AuthMiddleware(this.configService.get('JWT_ACCESS'));
+    this.app.use(authMiddleware.fn.bind(authMiddleware));
   }
 
   useRoutes(): void {

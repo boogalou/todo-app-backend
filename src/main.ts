@@ -19,6 +19,8 @@ import { TokenService } from './token/token.service';
 import { ITokenService } from './token/token.service.inteface';
 import { ITokenRepo } from './token/token.repo.interface';
 import { TokenRepo } from './token/token.repo';
+import { IEmailService } from './email/email.service.interface';
+import { EmailService } from './email/email.service';
 
 export const appBindingsContainer = new ContainerModule((bind: interfaces.Bind) => {
   bind<ILogger>(TYPES.ILogger).to(LoggerService).inSingletonScope();
@@ -30,6 +32,7 @@ export const appBindingsContainer = new ContainerModule((bind: interfaces.Bind) 
   bind<IUserRepo>(TYPES.UserRepo).to(UserRepo).inSingletonScope()
   bind<ITokenService>(TYPES.TokenService).to(TokenService).inSingletonScope()
   bind<ITokenRepo>(TYPES.TokenRepo).to(TokenRepo).inSingletonScope()
+  bind<IEmailService>(TYPES.EmailService).to(EmailService).inSingletonScope()
 
 
   bind<App>(TYPES.Application).to(App);

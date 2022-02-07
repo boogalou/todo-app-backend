@@ -9,4 +9,5 @@ export const TYPES = {
   UserRepo: Symbol.for('UserRepo'),
   TokenService: Symbol.for('TokenService'),
   TokenRepo: Symbol.for('TokenRepo'),
+  EmailService: Symbol.for('EmailService'),
 };

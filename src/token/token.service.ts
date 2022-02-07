@@ -2,10 +2,12 @@ import 'reflect-metadata';
 import { inject, injectable } from 'inversify';
 import { ConfigService } from '../config/config.service';
 import { TYPES } from '../types';
-import { sign, } from 'jsonwebtoken';
+import { JwtPayload, sign, verify } from 'jsonwebtoken';
 import { ITokenService, Tokens } from './token.service.inteface';
 import { UserEntity } from '../user/user.entity';
 import { ITokenRepo } from './token.repo.interface';
+import { ITokenModel } from './token.model.interface';
+
 
 @injectable()
 export class TokenService implements ITokenService {
@@ -16,14 +18,8 @@ export class TokenService implements ITokenService {
   ) {
   }
 
-  generateToken({name, email, password}: UserEntity): Tokens {
-    const accessToken = sign({name, email, password}, this.configService.get('JWT_ACCESS'));
-    const refreshToken = sign({name, email}, this.configService.get('JWT_REFRESH'));
-    return {accessToken, refreshToken};
-  }
-
   async saveToken(userID: string, refreshToken: string) {
-    const tokenData = await this.tokenRepo.find(userID);
+    const tokenData = await this.tokenRepo.findID(userID);
     if (tokenData) {
       tokenData.refreshToken = refreshToken;
       await tokenData.save();
@@ -31,8 +27,29 @@ export class TokenService implements ITokenService {
     const token = await this.tokenRepo.create(userID, refreshToken);
   }
 
-  async removeToken(refreshToken: string): Promise<boolean> {
+  async removeToken(refreshToken: string): Promise<unknown> {
     const tokenData = await this.tokenRepo.removeToken(refreshToken);
     return tokenData
+  }
+
+  async findToken(refreshToken: string): Promise<ITokenModel | null> {
+    const tokenData = await this.tokenRepo.findToken( refreshToken );
+    return tokenData;
+  }
+
+  generateToken({name, email, password}: UserEntity): Tokens {
+    const accessToken = sign({name, email, password}, this.configService.get('JWT_ACCESS'));
+    const refreshToken = sign({name, email}, this.configService.get('JWT_REFRESH'));
+    return {accessToken, refreshToken};
+  }
+
+  validateAccessToken(token: string): string | JwtPayload {
+    const tokenData = verify(token, this.configService.get('JWT_ACCESS'));
+    return tokenData;
+  }
+
+  validateRefreshToken(token: string): string | JwtPayload {
+    const tokenData = verify(token, this.configService.get('JWT_REFRESH'));
+    return tokenData;
   }
 }
