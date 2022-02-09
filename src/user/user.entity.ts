@@ -1,8 +1,10 @@
 import { compare, hash } from 'bcryptjs';
+import { ITodoModel } from '../todo/types/todo.model.interface';
 
 export class UserEntity {
   private _password: string;
   private _isActivated: boolean;
+  private _todos: ITodoModel[];
   private _id: string;
   private _refreshToken: string;
 
@@ -20,7 +22,7 @@ export class UserEntity {
     }
   }
 
-  get id (): string {
+  get id(): string {
     return this._id;
   }
 
@@ -34,6 +36,10 @@ export class UserEntity {
 
   get password(): string {
     return this._password;
+  }
+
+  get todos(): ITodoModel[] {
+    return this._todos;
   }
 
   get isActivated(): boolean {

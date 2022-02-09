@@ -51,7 +51,6 @@ export class UserController extends BaseController implements IUserController {
 
   public async registration(req: Request<{}, {}, UserRegistrationDto>, res: Response, next: NextFunction): Promise<void> {
     const {name, email, password} = req.body;
-    debugger
     const user = await this.userService.registration({ name, email, password });
     res.cookie('refreshToken', user?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
     if (!user) {
@@ -105,7 +104,4 @@ export class UserController extends BaseController implements IUserController {
       console.log(err);
     }
   }
-
-
-
 }

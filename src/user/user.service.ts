@@ -5,7 +5,7 @@ import { inject, injectable } from 'inversify';
 import { UserEntity } from './user.entity';
 import { TYPES } from '../types';
 import { IConfigService } from '../config/config.iterface';
-import { IUserRepo } from './user.repository.interface';
+import { IUserRepository } from './user.repository.interface';
 import { ITokenService } from '../token/token.service.inteface';
 import 'reflect-metadata';
 import { HttpError } from '../errors/http-error';
@@ -19,7 +19,7 @@ export class UserService implements IUserService {
 
   constructor(
     @inject(TYPES.ConfigService) private configService: IConfigService,
-    @inject(TYPES.UserRepo) private userRepository: IUserRepo,
+    @inject(TYPES.UserRepo) private userRepository: IUserRepository,
     @inject(TYPES.TokenService) private tokenService: ITokenService,
     @inject(TYPES.EmailService) private emailService: IEmailService,
   ) {
@@ -31,11 +31,10 @@ export class UserService implements IUserService {
                        password
                      }: UserRegistrationDto): Promise<{ accessToken: string, refreshToken: string, user: UserEntity } | null> {
     const newUser = new UserEntity(name, email);
-    debugger
     const salt = this.configService.get('SALT');
     await newUser.setPassword(password, Number(salt));
     const activateLink = v4();
-    await this.emailService.sendMailForActivation(email, `${this.configService.get('API_URL')}/activate/${activateLink}`)
+    await this.emailService.sendMailForActivation(email, `${this.configService.get('API_URL')}api/activate/${activateLink}`)
     const existUser = await this.userRepository.find(email);
     debugger
     if (existUser) {

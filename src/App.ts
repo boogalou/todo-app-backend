@@ -11,6 +11,7 @@ import { UserController } from './user/user.controller';
 import { DatabaseService } from './Database/database.service';
 import { ConfigService } from './config/config.service';
 import { AuthMiddleware } from './common/auth.middleware';
+import { TodoController } from './todo/todo.controller';
 
 @injectable()
 export class App {
@@ -23,7 +24,8 @@ export class App {
     @inject(TYPES.ExceptionFilter) private exceptionFilter: IExceptionFilter,
     @inject(TYPES.UserController) private userController: UserController,
     @inject(TYPES.ConfigService) private configService: ConfigService,
-    @inject(TYPES.DatabaseService) private databaseService: DatabaseService
+    @inject(TYPES.DatabaseService) private databaseService: DatabaseService,
+    @inject(TYPES.TodoController) private todoController: TodoController,
     ) {
 
     this.app = express();
@@ -38,7 +40,11 @@ export class App {
   }
 
   useRoutes(): void {
-    this.app.use('/', this.userController.router);
+    this.app.use('/api', [
+      this.userController.router,
+      this.todoController.router
+    ]);
+
   }
 
   useExceptionFilters(): void {

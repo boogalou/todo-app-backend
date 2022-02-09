@@ -1,4 +1,4 @@
-import { IUserRepo } from './user.repository.interface';
+import { IUserRepository } from './user.repository.interface';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { UserEntity } from './user.entity';
@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { IUserModel } from './user.model.interface';
 
 @injectable()
-export class UserRepo implements IUserRepo {
+export class UserRepository implements IUserRepository {
   model: Model<IUserModel>
 
   constructor() {

@@ -1,3 +1,5 @@
+import { TodoController } from "./todo/todo.controller";
+
 export const TYPES = {
   Application: Symbol.for('Application'),
   ILogger: Symbol.for('ILogger'),
@@ -10,4 +12,7 @@ export const TYPES = {
   TokenService: Symbol.for('TokenService'),
   TokenRepo: Symbol.for('TokenRepo'),
   EmailService: Symbol.for('EmailService'),
+  TodoController: Symbol.for('TodoController'),
+  TodoService: Symbol.for('TodoService'),
+  TodoRepository: Symbol.for('TodoRepository'),
 };
