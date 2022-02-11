@@ -12,6 +12,7 @@ import { DatabaseService } from './Database/database.service';
 import { ConfigService } from './config/config.service';
 import { AuthMiddleware } from './common/auth.middleware';
 import { TodoController } from './todo/todo.controller';
+import cors from 'cors';
 
 @injectable()
 export class App {
@@ -33,6 +34,10 @@ export class App {
   }
 
   useMiddleware(): void {
+    this.app.use(cors({
+      credentials: true,
+      origin: 'http://localhost:3000'
+    }))
     this.app.use(json());
     this.app.use(cookieParser());
     const authMiddleware = new AuthMiddleware(this.configService.get('JWT_ACCESS'));

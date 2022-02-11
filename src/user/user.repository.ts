@@ -14,7 +14,7 @@ export class UserRepository implements IUserRepository {
     this.model = UserModel
   }
 
-  async create({name, email, password}: UserEntity): Promise<IUserModel> {
+  async create({ name, email, password }: UserEntity): Promise<IUserModel> {
     const newUser = await this.model.create({
       name,
       email,
