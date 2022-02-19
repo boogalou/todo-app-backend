@@ -1,8 +1,8 @@
-import { ITokenRepo } from './token.repo.interface';
+import { ITokenRepo } from './types/token.repo.interface';
 import { injectable } from 'inversify';
 import mongoose, { Model } from 'mongoose';
 import TokenModel from './token.model';
-import { ITokenModel } from './token.model.interface';
+import { ITokenModel } from './types/token.model.interface';
 
 @injectable()
 export class TokenRepo implements ITokenRepo {

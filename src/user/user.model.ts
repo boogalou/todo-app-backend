@@ -1,7 +1,5 @@
 import mongoose, { Schema } from 'mongoose';
-import { TODO_MODEL } from '../todo/todo.model';
-import { USER_MODEL } from './model.constant';
-import { IUserModel } from './user.model.interface';
+import { IUserModel } from './types/user.model.interface';
 
 
 const UserSchema = new Schema({
@@ -20,19 +18,15 @@ const UserSchema = new Schema({
     unique: true,
     required: true,
   },
-  todos: [{
-    type: Schema.Types.ObjectId,
-    ref: TODO_MODEL,
-  }],
-    isActivated: {
-      type: Boolean,
-      default: false,
-    },
-    activationLink: {
-      type: String,
-    },
-  });
+  isActivated: {
+    type: Boolean,
+    default: false,
+  },
+  activationLink: {
+    type: String,
+  }
+});
 
-const UserModel = mongoose.model<IUserModel>(USER_MODEL, UserSchema);
+const UserModel = mongoose.model<IUserModel>('User', UserSchema);
 
 export default UserModel;

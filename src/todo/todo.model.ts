@@ -1,8 +1,5 @@
-import mongoose, { Schema } from "mongoose";
-import { USER_MODEL } from "../user/model.constant";
+import mongoose, { Schema } from 'mongoose';
 import { ITodoModel } from './types/todo.model.interface';
-
-export const TODO_MODEL = 'Todo';
 
 const TodoSchema = new Schema({
   title: {
@@ -14,9 +11,12 @@ const TodoSchema = new Schema({
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: USER_MODEL,
-  }
+    ref:"User"
+  },
+
+  createdAt: Date,
+
 });
 
-const TodoModel = mongoose.model<ITodoModel>(TODO_MODEL, TodoSchema);
-export default  TodoModel
+const TodoModel = mongoose.model<ITodoModel>('Todo', TodoSchema);
+export default TodoModel;

@@ -6,40 +6,45 @@ import { CreateTodoDto } from './dto/todo.dto';
 import { Model } from 'mongoose';
 import { ITodoModel } from './types/todo.model.interface';
 import TodoModel from './todo.model';
-import { TodoResponse } from './types/todo.response.interface';
+import { TodoEntity } from './todo.entity';
 
 
 @injectable()
 export class TodoRepository implements ITodoRepository {
-  model: Model<ITodoModel>
+  todoModel: Model<ITodoModel>
 
   constructor(
-
     @inject(TYPES.ILogger) private logger: ILogger,
     ) {
-    this.model = TodoModel;
+    this.todoModel = TodoModel;
+
   }
 
-  async create({title, completed}: CreateTodoDto): Promise<TodoResponse> {
-    console.log(title, completed);
-    const newTodo = await this.model.create({ title, completed })
+  async create({title, completed}: TodoEntity, userID: string): Promise<ITodoModel> {
+    const newTodo = await this.todoModel.create({
+      title,
+      completed,
+      user: userID,
+      createdAt: Date.now()
+    });
+    console.log('todo.repository:', newTodo);
     return newTodo;
   }
 
   async find(todoId: string): Promise<unknown> {
     console.log(todoId);
-    const response = this.model.findByIdAndDelete({_id: todoId});
+    const response = this.todoModel.findByIdAndDelete({_id: todoId});
     console.log(response);
     return response
   }
 
   async findByIdAdnUp(todoId: string, todoCompleted: boolean): Promise<unknown> {
-    const response = await this.model.findByIdAndUpdate(todoId, { completed: todoCompleted });
+    const response = await this.todoModel.findByIdAndUpdate(todoId, { completed: todoCompleted });
     return response;
   }
 
-  async findAll(): Promise<CreateTodoDto[]> {
-    const response = await this.model.find()
+  async findAll(userID: string): Promise<CreateTodoDto[]> {
+    const response = await this.todoModel.find({user: userID})
     return response;
 
   }

@@ -1,4 +1,4 @@
-import { UserEntity } from '../user/user.entity';
+import { UserEntity } from '../../user/user.entity';
 import { JwtPayload } from 'jsonwebtoken';
 import { ITokenModel } from './token.model.interface';
 

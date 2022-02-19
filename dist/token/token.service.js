@@ -44,7 +44,7 @@ let TokenService = class TokenService {
                 tokenData.refreshToken = refreshToken;
                 yield tokenData.save();
             }
-            const token = yield this.tokenRepo.create(userID, refreshToken);
+            const token = yield this.tokenRepo.create(userID);
         });
     }
     removeToken(refreshToken) {

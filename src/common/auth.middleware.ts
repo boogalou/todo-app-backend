@@ -1,20 +1,20 @@
 import { IMiddleware } from './middleware.interface';
 import { NextFunction, Request, Response } from 'express';
-import { verify } from 'jsonwebtoken';
-
+import { decode, verify } from 'jsonwebtoken';
 
 export class AuthMiddleware implements IMiddleware {
-  constructor(private secret: string) {
-  }
+  constructor(private secret: string) {}
 
-  fn(req: Request, res: Response, next: NextFunction): void {
+  execute(req: Request, res: Response, next: NextFunction): void {
     if (req.headers.authorization) {
-      verify(req.headers.authorization.split(' ')[1], this.secret, (err, payload) => {
+      const token = req.headers.authorization.split(' ')[1];
+      verify(token, this.secret, (err, payload) => {
         if (err) {
-          next()
+          next();
         } else if (payload) {
-          req.user = payload as string;
-          next()
+          const tokenData = decode(token) as { email: string };
+          req.user = tokenData.email;
+          next();
         }
       });
     } else {

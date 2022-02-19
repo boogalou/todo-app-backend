@@ -5,8 +5,9 @@ import { TYPES } from '../types';
 import { ILogger } from '../logger/logger.interface';
 import { NextFunction, Request, Response, } from 'express';
 import { ExceptionFilter } from '../errors/exception.filter';
-import { CreateTodoDto } from './dto/todo.dto';
 import { TodoService } from './todo.service';
+import { AuthGuard } from '../common/auth.guard';
+import { CreateTodoDto } from './dto/todo.dto';
 
 @injectable()
 export class TodoController extends BaseController implements ITodoController {
@@ -19,43 +20,47 @@ export class TodoController extends BaseController implements ITodoController {
     super(loggerService);
     this.bindRoutes([
       {
-        path: '/create',
+        path: '/todos/create/:id',
         method: 'post',
         func: this.create,
-        middlewares: [],
+        middlewares: [new AuthGuard()],
       },
       {
-        path: '/delete/:id',
+        path: 'todos/delete/:id',
         method: 'delete',
         func: this.delete,
-        middlewares: [],
+        middlewares: [new AuthGuard()],
       },
       {
-        path: '/update/:id',
+        path: 'todos/update/:id',
         method: 'patch',
         func: this.update,
-        middlewares: [],
+        middlewares: [new AuthGuard()],
       },
       {
-        path: '/todos/',
+        path: '/todos',
         method: 'get',
         func: this.getAll,
-        middlewares: [],
+        middlewares: [new AuthGuard()],
       },
     ]);
   }
 
   async create(
-    req: Request<{}, {}, CreateTodoDto>,
+    req: Request<{},{}, CreateTodoDto>,
     res: Response,
     next: NextFunction): Promise<void> {
     try {
-      const todoData = req.body;
-      if (!todoData) {
+      const userID = Object.values(req.params).filter(String).join();
+      console.log('controller', userID);
+      const payload = req.body;
+      if (!payload) {
         this.send(res, 401, `Непрдвиденный сбой`);
       }
-      const newTodo = await this.todoService.create(todoData);
-      this.send(res, 201, {...newTodo});
+      const newTodo = await this.todoService.create( payload, userID );
+      if (newTodo) {
+        this.send(res, 201, { newTodo });
+      }
     } catch (err) {
       console.log(err);
     }
@@ -75,12 +80,12 @@ export class TodoController extends BaseController implements ITodoController {
     }
   }
 
- async update(req: Request, res: Response, next: NextFunction
+  async update(req: Request, res: Response, next: NextFunction
   ): Promise<void> {
     try {
-      const todoId = req.params.id as string;
+      const todoId = req.params.id;
       const todoCompleted = req.body.completed as boolean;
-      const response = await this.todoService.update(todoId, todoCompleted)
+      const response = await this.todoService.update(todoId, todoCompleted);
       this.send(res, 201, {response});
     } catch (err) {
       console.log(err);
@@ -89,8 +94,11 @@ export class TodoController extends BaseController implements ITodoController {
 
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const response = await this.todoService.findAll();
-      this.send(res, 201, {response});
+      const userID = req.body.id;
+      console.log('userID:', userID);
+      const response = await this.todoService.findAll(userID);
+      console.log(response);
+      this.send(res, 200, {todos: response});
     } catch (err) {
       console.log(err);
     }

@@ -8,7 +8,7 @@ import { IMiddleware } from './middleware.interface';
 export class ValidateMiddleware implements IMiddleware {
   constructor(private classToValidate: ClassConstructor<object>) {}
 
-  fn(req: Request, res: Response, next: NextFunction): void {
+  execute(req: Request, res: Response, next: NextFunction): void {
     const instance = plainToInstance(this.classToValidate, req.body);
     validate(instance).then((errors) => {
       if (errors.length > 0) {

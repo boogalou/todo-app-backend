@@ -14,10 +14,12 @@ export class TodoService implements ITodoService {
   ) {
   }
 
-  async create(payload: CreateTodoDto): Promise<CreateTodoDto | null> {
+  async create(payload: CreateTodoDto, userID: string): Promise<CreateTodoDto | null> {
+    console.log('service:', payload);
     if (!payload) return null;
-    const todoEntity = new TodoEntity(payload.title, payload.completed);
-    const newTodo = await this.todoRepository.create(todoEntity);
+    const todoEntity = new TodoEntity(payload.title, payload.completed, userID);
+    const newTodo = await this.todoRepository.create(todoEntity, userID);
+
     return newTodo;
   }
 
@@ -35,8 +37,8 @@ export class TodoService implements ITodoService {
   }
 
 
-  async findAll(): Promise<CreateTodoDto[]> {
-    const response = await this.todoRepository.findAll();
+  async findAll(userID: string): Promise<CreateTodoDto[]> {
+    const response = await this.todoRepository.findAll(userID);
     return response;
   }
 

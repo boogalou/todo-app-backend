@@ -1,21 +1,24 @@
-import { IUserRepository } from './user.repository.interface';
+import { IUserRepository } from './types/user.repository.interface';
 import { injectable } from 'inversify';
 import 'reflect-metadata';
 import { UserEntity } from './user.entity';
 import UserModel from './user.model';
 import { Model } from 'mongoose';
-import { IUserModel } from './user.model.interface';
+import { IUserModel } from './types/user.model.interface';
+import { ITodoModel } from '../todo/types/todo.model.interface';
+import TodoModel from '../todo/todo.model';
 
 @injectable()
 export class UserRepository implements IUserRepository {
-  model: Model<IUserModel>
+  userModel: Model<IUserModel>
+
 
   constructor() {
-    this.model = UserModel
+    this.userModel = UserModel
   }
 
   async create({ name, email, password }: UserEntity): Promise<IUserModel> {
-    const newUser = await this.model.create({
+    const newUser = await this.userModel.create({
       name,
       email,
       password
@@ -24,17 +27,17 @@ export class UserRepository implements IUserRepository {
   }
 
   async find(query: string): Promise<IUserModel | null> {
-    const result = await this.model.findOne({ email: query } );
+    const result = await this.userModel.findOne({ email: query } );
     return result;
   }
 
   async findLink(activateLink: string): Promise<IUserModel | null> {
-    const response = await this.model.findOne({activateLink});
+    const response = await this.userModel.findOne({activateLink});
     return  response
   }
 
   async findById(id: string): Promise<IUserModel | null> {
-    const result = await this.model.findById({id: id });
+    const result = await this.userModel.findById({id: id });
     return result;
   }
 }

@@ -1,11 +1,12 @@
 import { CreateTodoDto } from '../dto/todo.dto';
-import { TodoResponse } from './todo.response.interface';
+import { TodoEntity } from '../todo.entity';
+import { ITodoModel } from './todo.model.interface';
 
 
 export interface ITodoRepository {
 
-  create: (todoData: CreateTodoDto) => Promise<TodoResponse>;
+  create: (payload: TodoEntity, userID: string) => Promise<ITodoModel>;
   find: (todoId: string) => Promise<unknown>
   findByIdAdnUp: (todoId: string, todoCompleted: boolean) => Promise<unknown>
-  findAll: () => Promise<CreateTodoDto[]>
+  findAll: (userID: string) => Promise<CreateTodoDto[]>
 }

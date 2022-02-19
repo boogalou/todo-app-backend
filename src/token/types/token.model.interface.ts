@@ -1,4 +1,4 @@
-import { IUserModel } from '../user/user.model.interface';
+import { IUserModel } from '../../user/types/user.model.interface';
 import { Document } from 'mongoose';
 
 export interface ITokenModel extends Document {

@@ -40,8 +40,8 @@ export class App {
     }))
     this.app.use(json());
     this.app.use(cookieParser());
-    const authMiddleware = new AuthMiddleware(this.configService.get('JWT_ACCESS'));
-    this.app.use(authMiddleware.fn.bind(authMiddleware));
+    const authMiddleware = new AuthMiddleware(this.configService.get('JWT_REFRESH'));
+    this.app.use(authMiddleware.execute.bind(authMiddleware));
   }
 
   useRoutes(): void {

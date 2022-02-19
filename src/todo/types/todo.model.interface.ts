@@ -1,9 +1,9 @@
 import { Document } from 'mongoose'
-import { IUserModel } from '../../user/user.model.interface';
+import { IUserModel } from '../../user/types/user.model.interface';
 
 export interface ITodoModel extends Document{
-  id: string;
   title: string;
   completed: boolean;
-  user: IUserModel
+  user: IUserModel;
+  createdAt: Date
 }

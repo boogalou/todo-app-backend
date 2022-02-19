@@ -1,24 +1,18 @@
-import { IUserModel } from '../user/user.model.interface';
-
-
 export class TodoEntity {
   private _id: string;
-  private _user: IUserModel;
-
-
+  private _createdAt: Date;
   constructor(
     private _title: string,
     private _completed: boolean,
+    private _user: string,
   ) {
-
-
   }
 
   get id(): string {
     return this._id;
   }
 
-  get user(): IUserModel {
+  get user(): string {
     return this._user;
   }
 
@@ -28,6 +22,10 @@ export class TodoEntity {
 
   get completed(): boolean {
     return this._completed;
+  }
+
+  get createdAt(): Date {
+    return this._createdAt;
   }
 
 
@@ -41,5 +39,9 @@ export class TodoEntity {
 
   set completed(completed: boolean) {
     this._completed = completed;
+  }
+
+  set createdAt(createdAt: Date) {
+    this._createdAt = createdAt
   }
 }

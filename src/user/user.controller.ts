@@ -3,11 +3,11 @@ import { inject, injectable } from 'inversify';
 import { NextFunction, Request, Response } from 'express';
 
 import { BaseController } from '../common/base.controller';
-import { IUserController } from './user.controller.interface';
+import { IUserController } from './types/user.controller.interface';
 import { TYPES } from '../types';
 import { ILogger } from '../logger/logger.interface';
 import { UserRegistrationDto } from './dto/user-registration.dto';
-import { IUserService } from './user.service.interface';
+import { IUserService } from './types/user.service.interface';
 import { UserLoginDto } from './dto/user-login.dto';
 import { HttpError } from '../errors/http-error';
 import { IConfigService } from '../config/config.iterface';
@@ -46,18 +46,32 @@ export class UserController extends BaseController implements IUserController {
         func: this.activate,
         middlewares: [],
       },
+      {
+        path: '/refresh',
+        method: 'get',
+        func: this.refresh,
+        middlewares: [],
+      },
     ]);
   }
 
   public async registration(req: Request<{}, {}, UserRegistrationDto>, res: Response, next: NextFunction): Promise<void> {
-    console.log(req.body);
     const {name, email, password} = req.body;
-    const user = await this.userService.registration({ name, email, password });
-    res.cookie('refreshToken', user?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-    if (!user) {
+    const response = await this.userService.registration({ name, email, password });
+    res.cookie('refreshToken', response?.tokens.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+    if (!response) {
       return next(new HttpError(401, 'Пользователь с таким email уже существует'));
     }
-    this.send(res, 200, user);
+    this.send(res, 201, {
+      id: response.user._id,
+      email: response.user.email,
+      name: response.user.name,
+      isActivated: response.user.isActivated,
+      tokens: {
+        accessToken: response.tokens.accessToken,
+        refreshToken: response.tokens.refreshToken,
+      }
+    },);
   }
 
   public async login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction) {
@@ -65,7 +79,7 @@ export class UserController extends BaseController implements IUserController {
 
     const loginData = await this.userService.login({email, password});
     res.cookie('refreshToken', loginData?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-    return res.json(loginData);
+    this.send(res, 200, loginData)
     if (!loginData) {
       return next(new HttpError(401, 'Пользователь с таким email не найден'));
     }
@@ -76,22 +90,25 @@ export class UserController extends BaseController implements IUserController {
     const  token = await this.userService.logout(refreshToken);
     console.log(token);
     res.clearCookie('refreshToken');
-    return this.ok(res, 200, );
+    return this.ok(res, 200);
   }
 
   public async refresh(req: Request, res: Response, next: NextFunction) {
+
     try {
       const {refreshToken} = req.cookies;
       const tokenData = await this.userService.refreshToken(refreshToken);
       if (!tokenData) {
         return null
       }
-
-      res.cookie('refreshToken', tokenData.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-      return this.send(res, 201, refreshToken)
-
+      res.cookie('refreshToken', tokenData.refreshToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true
+      });
+      console.log('userController', refreshToken);
+      this.send(res, 200, tokenData);
     } catch (err) {
-      next(err)
+      console.log(err);
     }
   }
 

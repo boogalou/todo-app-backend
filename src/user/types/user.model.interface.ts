@@ -1,11 +1,10 @@
 import { Document } from 'mongoose';
-import { ITodoModel } from '../todo/types/todo.model.interface';
 
 export interface IUserModel extends Document {
+  id: string;
   email: string;
   name: string;
   password: string;
-  todos: ITodoModel;
   isActivated: boolean;
   activationLink: string;
 }

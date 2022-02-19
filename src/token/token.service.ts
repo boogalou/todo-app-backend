@@ -3,10 +3,10 @@ import { inject, injectable } from 'inversify';
 import { ConfigService } from '../config/config.service';
 import { TYPES } from '../types';
 import { JwtPayload, sign, verify } from 'jsonwebtoken';
-import { ITokenService, Tokens } from './token.service.inteface';
+import { ITokenService, Tokens } from './types/token.service.inteface';
 import { UserEntity } from '../user/user.entity';
-import { ITokenRepo } from './token.repo.interface';
-import { ITokenModel } from './token.model.interface';
+import { ITokenRepo } from './types/token.repo.interface';
+import { ITokenModel } from './types/token.model.interface';
 
 
 @injectable()
@@ -37,9 +37,9 @@ export class TokenService implements ITokenService {
     return tokenData;
   }
 
-  generateToken({name, email, password}: UserEntity): Tokens {
-    const accessToken = sign({name, email, password}, this.configService.get('JWT_ACCESS'));
-    const refreshToken = sign({name, email}, this.configService.get('JWT_REFRESH'));
+  generateToken({email, name, password}: UserEntity): Tokens {
+    const accessToken = sign({email, name, password}, this.configService.get('JWT_ACCESS'));
+    const refreshToken = sign({email, name, }, this.configService.get('JWT_REFRESH'));
     return {accessToken, refreshToken};
   }
 
