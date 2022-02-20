@@ -71,7 +71,6 @@ export class UserController extends BaseController implements IUserController {
 
     const loginData = await this.userService.login({email, password});
     res.cookie('refreshToken', loginData?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
-    console.log('login:', loginData);
     this.send(res, 200, loginData)
     if (!loginData) {
       return next(new HttpError(401, 'Пользователь с таким email не найден'));
@@ -81,7 +80,6 @@ export class UserController extends BaseController implements IUserController {
   public async logout({ cookies }: Request<{}, {}>, res: Response, next: NextFunction) {
     const {refreshToken} = cookies;
     const  token = await this.userService.logout(refreshToken);
-    console.log(token);
     res.clearCookie('refreshToken');
     return this.ok(res, 200);
   }

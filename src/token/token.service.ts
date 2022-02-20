@@ -38,7 +38,6 @@ export class TokenService implements ITokenService {
   }
 
   generateToken({name, email, password}: UserEntity): Tokens {
-    console.log('generateToken:', name, email);
     const accessToken = sign({name, email, password}, this.configService.get('JWT_ACCESS'));
     const refreshToken = sign({name, email,}, this.configService.get('JWT_REFRESH'));
     return {accessToken, refreshToken};
@@ -51,7 +50,6 @@ export class TokenService implements ITokenService {
 
   validateRefreshToken(token: string): string | JwtPayload {
     const tokenData = verify(token, this.configService.get('JWT_REFRESH'));
-    console.log('validateRefreshToken:', token);
     return tokenData;
   }
 }

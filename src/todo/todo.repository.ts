@@ -6,7 +6,7 @@ import { CreateTodoDto } from './dto/todo.dto';
 import { Model } from 'mongoose';
 import { ITodoModel } from './types/todo.model.interface';
 import TodoModel from './todo.model';
-import { TodoEntity } from './todo.entity';
+import { ResponseTodo } from './types/response.todo.interface';
 
 
 @injectable()
@@ -20,11 +20,11 @@ export class TodoRepository implements ITodoRepository {
 
   }
 
-  async create({title, completed}: TodoEntity, userID: string): Promise<ITodoModel> {
+  async create(payload: CreateTodoDto): Promise<ResponseTodo> {
     const newTodo = await this.todoModel.create({
-      title,
-      completed,
-      user: userID,
+      title: payload.title,
+      completed: payload.completed,
+      user: payload.userId,
       createdAt: Date.now()
     });
     console.log('todo.repository:', newTodo);
@@ -43,7 +43,7 @@ export class TodoRepository implements ITodoRepository {
     return response;
   }
 
-  async findAll(userID: string): Promise<CreateTodoDto[]> {
+  async findAll(userID: string): Promise<ResponseTodo[]> {
     const response = await this.todoModel.find({user: userID})
     return response;
 

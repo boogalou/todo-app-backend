@@ -8,6 +8,8 @@ import { ExceptionFilter } from '../errors/exception.filter';
 import { TodoService } from './todo.service';
 import { AuthGuard } from '../common/auth.guard';
 import { CreateTodoDto } from './dto/todo.dto';
+import { ValidateMiddleware } from '../common/validate.middleware';
+import { UserLoginDto } from '../user/dto/user-login.dto';
 
 @injectable()
 export class TodoController extends BaseController implements ITodoController {
@@ -20,7 +22,7 @@ export class TodoController extends BaseController implements ITodoController {
     super(loggerService);
     this.bindRoutes([
       {
-        path: '/todos/create/:id',
+        path: '/todos/newTodo',
         method: 'post',
         func: this.create,
         middlewares: [new AuthGuard()],
@@ -51,15 +53,14 @@ export class TodoController extends BaseController implements ITodoController {
     res: Response,
     next: NextFunction): Promise<void> {
     try {
-      const userID = Object.values(req.params).filter(String).join();
-      console.log('controller', userID);
+      console.log('todo.controller:', req.body);
       const payload = req.body;
       if (!payload) {
         this.send(res, 401, `Непрдвиденный сбой`);
       }
-      const newTodo = await this.todoService.create( payload, userID );
+      const newTodo = await this.todoService.create( payload );
       if (newTodo) {
-        this.send(res, 201, { newTodo });
+        this.send(res, 201, newTodo );
       }
     } catch (err) {
       console.log(err);

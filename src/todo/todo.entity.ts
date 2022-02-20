@@ -4,7 +4,7 @@ export class TodoEntity {
   constructor(
     private _title: string,
     private _completed: boolean,
-    private _user: string,
+    private _userId: string,
   ) {
   }
 
@@ -12,8 +12,8 @@ export class TodoEntity {
     return this._id;
   }
 
-  get user(): string {
-    return this._user;
+  get userId(): string {
+    return this._userId;
   }
 
   get title(): string {
