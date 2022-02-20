@@ -62,16 +62,8 @@ export class UserController extends BaseController implements IUserController {
     if (!response) {
       return next(new HttpError(401, 'Пользователь с таким email уже существует'));
     }
-    this.send(res, 201, {
-      id: response.user._id,
-      email: response.user.email,
-      name: response.user.name,
-      isActivated: response.user.isActivated,
-      tokens: {
-        accessToken: response.tokens.accessToken,
-        refreshToken: response.tokens.refreshToken,
-      }
-    },);
+
+    this.send(res, 201, response);
   }
 
   public async login(req: Request<{}, {}, UserLoginDto>, res: Response, next: NextFunction) {
@@ -79,6 +71,7 @@ export class UserController extends BaseController implements IUserController {
 
     const loginData = await this.userService.login({email, password});
     res.cookie('refreshToken', loginData?.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true});
+    console.log('login:', loginData);
     this.send(res, 200, loginData)
     if (!loginData) {
       return next(new HttpError(401, 'Пользователь с таким email не найден'));
@@ -94,7 +87,6 @@ export class UserController extends BaseController implements IUserController {
   }
 
   public async refresh(req: Request, res: Response, next: NextFunction) {
-
     try {
       const {refreshToken} = req.cookies;
       const tokenData = await this.userService.refreshToken(refreshToken);
@@ -105,7 +97,6 @@ export class UserController extends BaseController implements IUserController {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true
       });
-      console.log('userController', refreshToken);
       this.send(res, 200, tokenData);
     } catch (err) {
       console.log(err);

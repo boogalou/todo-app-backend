@@ -29,17 +29,18 @@ export class TokenService implements ITokenService {
 
   async removeToken(refreshToken: string): Promise<unknown> {
     const tokenData = await this.tokenRepo.removeToken(refreshToken);
-    return tokenData
-  }
-
-  async findToken(refreshToken: string): Promise<ITokenModel | null> {
-    const tokenData = await this.tokenRepo.findToken( refreshToken );
     return tokenData;
   }
 
-  generateToken({email, name, password}: UserEntity): Tokens {
-    const accessToken = sign({email, name, password}, this.configService.get('JWT_ACCESS'));
-    const refreshToken = sign({email, name, }, this.configService.get('JWT_REFRESH'));
+  async findToken(refreshToken: string): Promise<ITokenModel | null> {
+    const tokenData = await this.tokenRepo.findToken(refreshToken);
+    return tokenData;
+  }
+
+  generateToken({name, email, password}: UserEntity): Tokens {
+    console.log('generateToken:', name, email);
+    const accessToken = sign({name, email, password}, this.configService.get('JWT_ACCESS'));
+    const refreshToken = sign({name, email,}, this.configService.get('JWT_REFRESH'));
     return {accessToken, refreshToken};
   }
 
@@ -50,6 +51,7 @@ export class TokenService implements ITokenService {
 
   validateRefreshToken(token: string): string | JwtPayload {
     const tokenData = verify(token, this.configService.get('JWT_REFRESH'));
+    console.log('validateRefreshToken:', token);
     return tokenData;
   }
 }

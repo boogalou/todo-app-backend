@@ -49,14 +49,11 @@ export class UserService implements IUserService {
     }
   }
 
-  async login({
-                email,
-                password
-              }: UserLoginDto): Promise<{ accessToken: string, refreshToken: string, user: UserEntity } | null> {
+  async login({email, password}: UserLoginDto): Promise<{ accessToken: string, refreshToken: string, user: UserEntity } | null> {
     const user = await this.userRepository.find(email);
     if (!user) return null;
 
-    const newUser = new UserEntity(user.email, user.name, user._id, user.password);
+    const newUser = new UserEntity(user.name, user.email, user._id, user.password);
     const result = await newUser.comparePassword(password);
     if (!result) return null;
 
@@ -88,7 +85,6 @@ export class UserService implements IUserService {
     const newUser = new UserEntity(user.name, user.email, user.id);
     const tokens = this.tokenService.generateToken(newUser);
     await this.tokenService.saveToken(newUser.id!, tokens.refreshToken);
-    console.log('userService response:' ,{...tokens, newUser});
     return {...tokens, user: newUser};
   }
 
