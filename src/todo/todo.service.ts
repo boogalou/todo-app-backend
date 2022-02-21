@@ -21,7 +21,7 @@ export class TodoService implements ITodoService {
     const todoEntity = new TodoEntity(payload.title, payload.completed, payload.userId);
     const newTodo = await this.todoRepository.create(todoEntity);
 
-    return newTodo;
+    return newTodo ;
   }
 
   delete(todoId: string): Promise<unknown> {

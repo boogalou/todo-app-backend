@@ -1,10 +1,12 @@
+import { IUserModel } from '../user/types/user.model.interface';
+
 export class TodoEntity {
   private _id: string;
   private _createdAt: Date;
   constructor(
     private _title: string,
     private _completed: boolean,
-    private _userId: string,
+    private _userId: IUserModel,
   ) {
   }
 
@@ -12,7 +14,7 @@ export class TodoEntity {
     return this._id;
   }
 
-  get userId(): string {
+  get userId(): IUserModel {
     return this._userId;
   }
 

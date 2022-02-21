@@ -7,6 +7,7 @@ import { Model } from 'mongoose';
 import { ITodoModel } from './types/todo.model.interface';
 import TodoModel from './todo.model';
 import { ResponseTodo } from './types/response.todo.interface';
+import { IUserModel } from '../user/types/user.model.interface';
 
 
 @injectable()
