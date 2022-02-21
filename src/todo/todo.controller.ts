@@ -40,7 +40,7 @@ export class TodoController extends BaseController implements ITodoController {
         middlewares: [new AuthGuard()],
       },
       {
-        path: '/todos',
+        path: '/todos/:id',
         method: 'get',
         func: this.getAll,
         middlewares: [new AuthGuard()],
@@ -94,12 +94,13 @@ export class TodoController extends BaseController implements ITodoController {
   }
 
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    console.log('getAll:', Object.values(req.params));
     try {
-      const userID = req.body.id;
+      const userID = Object.values(req.params).join('');
       console.log('userID:', userID);
       const response = await this.todoService.findAll(userID);
       console.log(response);
-      this.send(res, 200, {todos: response});
+      this.send(res, 200, response);
     } catch (err) {
       console.log(err);
     }
