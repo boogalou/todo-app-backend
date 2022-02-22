@@ -8,8 +8,6 @@ import { ExceptionFilter } from '../errors/exception.filter';
 import { TodoService } from './todo.service';
 import { AuthGuard } from '../common/auth.guard';
 import { CreateTodoDto } from './dto/todo.dto';
-import { ValidateMiddleware } from '../common/validate.middleware';
-import { UserLoginDto } from '../user/dto/user-login.dto';
 
 @injectable()
 export class TodoController extends BaseController implements ITodoController {
@@ -28,13 +26,13 @@ export class TodoController extends BaseController implements ITodoController {
         middlewares: [new AuthGuard()],
       },
       {
-        path: 'todos/delete/:id',
+        path: '/todos/delete/:id',
         method: 'delete',
         func: this.delete,
         middlewares: [new AuthGuard()],
       },
       {
-        path: 'todos/update/:id',
+        path: '/todos/update',
         method: 'patch',
         func: this.update,
         middlewares: [new AuthGuard()],
@@ -48,32 +46,24 @@ export class TodoController extends BaseController implements ITodoController {
     ]);
   }
 
-  async create(
-    req: Request<{},{}, CreateTodoDto>,
-    res: Response,
-    next: NextFunction): Promise<void> {
+  async create(req: Request<{}, {}, CreateTodoDto>, res: Response, next: NextFunction): Promise<void> {
     try {
-      console.log('todo.controller:', req.body);
       const payload = req.body;
       if (!payload) {
         this.send(res, 401, `Непрдвиденный сбой`);
       }
-      const newTodo = await this.todoService.create( payload );
+      const newTodo = await this.todoService.create(payload);
       if (newTodo) {
-        this.send(res, 201, newTodo );
+        this.send(res, 201, newTodo);
       }
     } catch (err) {
       console.log(err);
     }
   }
 
-  async delete(
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<void> {
+  async delete(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const todoId = req.params.id as string;
+      const todoId = Object.values(req.params)[0]
       const response = await this.todoService.delete(todoId);
       this.send(res, 201, {response});
     } catch (err) {
@@ -81,25 +71,20 @@ export class TodoController extends BaseController implements ITodoController {
     }
   }
 
-  async update(req: Request, res: Response, next: NextFunction
-  ): Promise<void> {
+  async update(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const todoId = req.params.id;
-      const todoCompleted = req.body.completed as boolean;
-      const response = await this.todoService.update(todoId, todoCompleted);
-      this.send(res, 201, {response});
+      const {_id, completed} = req.body.payload;
+      await this.todoService.update(_id, completed);
+      this.send(res, 201, {message: 'ok'});
     } catch (err) {
       console.log(err);
     }
   }
 
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
-    console.log('getAll:', Object.values(req.params));
     try {
       const userID = Object.values(req.params).join('');
-      console.log('userID:', userID);
       const response = await this.todoService.findAll(userID);
-      console.log(response);
       this.send(res, 200, response);
     } catch (err) {
       console.log(err);

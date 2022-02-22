@@ -7,8 +7,6 @@ import { Model } from 'mongoose';
 import { ITodoModel } from './types/todo.model.interface';
 import TodoModel from './todo.model';
 import { ResponseTodo } from './types/response.todo.interface';
-import { IUserModel } from '../user/types/user.model.interface';
-
 
 @injectable()
 export class TodoRepository implements ITodoRepository {
@@ -28,20 +26,15 @@ export class TodoRepository implements ITodoRepository {
       user: payload.userId,
       createdAt: Date.now()
     });
-    console.log('todo.repository:', newTodo);
     return newTodo;
   }
 
-  async find(todoId: string): Promise<unknown> {
-    console.log(todoId);
-    const response = this.todoModel.findByIdAndDelete({_id: todoId});
-    console.log(response);
-    return response
+  async find(todoId: string): Promise<void> {
+   await this.todoModel.findByIdAndDelete({_id: todoId});
   }
 
-  async findByIdAdnUp(todoId: string, todoCompleted: boolean): Promise<unknown> {
-    const response = await this.todoModel.findByIdAndUpdate(todoId, { completed: todoCompleted });
-    return response;
+  async findByIdAdnUp(todoId: string, todoCompleted: boolean): Promise<void> {
+    await this.todoModel.findByIdAndUpdate(todoId, { completed: todoCompleted });
   }
 
   async findAll(userID: string): Promise<ResponseTodo[]> {

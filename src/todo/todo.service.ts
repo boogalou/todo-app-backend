@@ -5,6 +5,7 @@ import { TodoEntity } from './todo.entity';
 import { TYPES } from '../types';
 import { ITodoRepository } from './types/todo.repository.interface';
 import { ResponseTodo } from './types/response.todo.interface';
+import { ITodoModel } from './types/todo.model.interface';
 
 
 @injectable()
@@ -16,7 +17,6 @@ export class TodoService implements ITodoService {
   }
 
   async create(payload: CreateTodoDto): Promise<ResponseTodo | null> {
-    console.log('service:', payload);
     if (!payload) return null;
     const todoEntity = new TodoEntity(payload.title, payload.completed, payload.userId);
     const newTodo = await this.todoRepository.create(todoEntity);
@@ -24,17 +24,12 @@ export class TodoService implements ITodoService {
     return newTodo ;
   }
 
-  delete(todoId: string): Promise<unknown> {
-    console.log(todoId);
-
-    const response = this.todoRepository.find(todoId);
-    return response;
+  delete(todoId: string): void {
+    this.todoRepository.find(todoId);
   }
 
-  async update(todoId: string, todoCompleted: boolean): Promise<unknown> {
-    console.log(todoId, todoCompleted);
-    const response = await this.todoRepository.findByIdAdnUp(todoId, todoCompleted );
-    return response;
+  async update(todoId: string, todoCompleted: boolean): Promise<void> {
+     await this.todoRepository.findByIdAdnUp(todoId, todoCompleted);
   }
 
 
