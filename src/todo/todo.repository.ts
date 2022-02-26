@@ -20,6 +20,7 @@ export class TodoRepository implements ITodoRepository {
   }
 
   async create(payload: CreateTodoDto): Promise<ResponseTodo> {
+    console.log('created paylad>>', payload);
     const newTodo = await this.todoModel.create({
       title: payload.title,
       completed: payload.completed,

@@ -36,7 +36,7 @@ export class App {
   useMiddleware(): void {
     this.app.use(cors({
       credentials: true,
-      origin: 'http://localhost:3000'
+      origin: 'https://todo-react-app-pied.vercel.app'
     }))
     this.app.use(json());
     this.app.use(cookieParser());

@@ -83,8 +83,11 @@ export class TodoController extends BaseController implements ITodoController {
 
   async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
+      console.log(req.params);
       const userID = Object.values(req.params).join('');
+      console.log(userID);
       const response = await this.todoService.findAll(userID);
+      console.log(response);
       this.send(res, 200, response);
     } catch (err) {
       console.log(err);
