@@ -34,16 +34,22 @@ let TokenRepo = class TokenRepo {
             return token;
         });
     }
-    find(userID) {
+    findID(userID) {
         return __awaiter(this, void 0, void 0, function* () {
             const tokenData = yield this.model.findOne({ id: userID });
+            return tokenData;
+        });
+    }
+    findToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokenData = yield this.model.findOne({ token });
             return tokenData;
         });
     }
     removeToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
             const tokenData = yield this.model.deleteOne({ refreshToken });
-            return !!tokenData;
+            return tokenData;
         });
     }
 };

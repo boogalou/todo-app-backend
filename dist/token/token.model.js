@@ -20,11 +20,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
-const model_constant_1 = require("./model.constant");
 const TokenSchema = new mongoose_1.Schema({
-    user: { type: mongoose_1.Schema.Types.ObjectId, ref: 'User', },
-    refreshToken: { type: String, required: true, },
+    user: {
+        type: mongoose_1.Schema.Types.ObjectId,
+        ref: 'users',
+    },
+    refreshToken: {
+        type: String, required: true,
+    },
 });
-const TokenModel = mongoose_1.default.model(model_constant_1.TOKEN_MODEL, TokenSchema);
+const TokenModel = mongoose_1.default.model('tokens', TokenSchema);
 exports.default = TokenModel;
 //# sourceMappingURL=token.model.js.map

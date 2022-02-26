@@ -12,5 +12,9 @@ exports.TYPES = {
     UserRepo: Symbol.for('UserRepo'),
     TokenService: Symbol.for('TokenService'),
     TokenRepo: Symbol.for('TokenRepo'),
+    EmailService: Symbol.for('EmailService'),
+    TodoController: Symbol.for('TodoController'),
+    TodoService: Symbol.for('TodoService'),
+    TodoRepository: Symbol.for('TodoRepository'),
 };
 //# sourceMappingURL=types.js.map

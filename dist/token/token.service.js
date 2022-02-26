@@ -32,19 +32,14 @@ let TokenService = class TokenService {
         this.configService = configService;
         this.tokenRepo = tokenRepo;
     }
-    generateToken({ name, email, password }) {
-        const accessToken = (0, jsonwebtoken_1.sign)({ name, email, password }, this.configService.get('JWT_ACCESS'));
-        const refreshToken = (0, jsonwebtoken_1.sign)({ name, email }, this.configService.get('JWT_REFRESH'));
-        return { accessToken, refreshToken };
-    }
     saveToken(userID, refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            const tokenData = yield this.tokenRepo.find(userID);
+            const tokenData = yield this.tokenRepo.findID(userID);
             if (tokenData) {
                 tokenData.refreshToken = refreshToken;
                 yield tokenData.save();
             }
-            const token = yield this.tokenRepo.create(userID);
+            const token = yield this.tokenRepo.create(userID, refreshToken);
         });
     }
     removeToken(refreshToken) {
@@ -52,6 +47,25 @@ let TokenService = class TokenService {
             const tokenData = yield this.tokenRepo.removeToken(refreshToken);
             return tokenData;
         });
+    }
+    findToken(refreshToken) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tokenData = yield this.tokenRepo.findToken(refreshToken);
+            return tokenData;
+        });
+    }
+    generateToken({ name, email, password }) {
+        const accessToken = (0, jsonwebtoken_1.sign)({ name, email, password }, this.configService.get('JWT_ACCESS'));
+        const refreshToken = (0, jsonwebtoken_1.sign)({ name, email, }, this.configService.get('JWT_REFRESH'));
+        return { accessToken, refreshToken };
+    }
+    validateAccessToken(token) {
+        const tokenData = (0, jsonwebtoken_1.verify)(token, this.configService.get('JWT_ACCESS'));
+        return tokenData;
+    }
+    validateRefreshToken(token) {
+        const tokenData = (0, jsonwebtoken_1.verify)(token, this.configService.get('JWT_REFRESH'));
+        return tokenData;
     }
 };
 TokenService = __decorate([

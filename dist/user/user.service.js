@@ -26,18 +26,22 @@ const inversify_1 = require("inversify");
 const user_entity_1 = require("./user.entity");
 const types_1 = require("../types");
 require("reflect-metadata");
+const http_error_1 = require("../errors/http-error");
+const uuid_1 = require("uuid");
 let UserService = class UserService {
-    constructor(configService, userRepository, tokenService) {
+    constructor(configService, userRepository, tokenService, emailService) {
         this.configService = configService;
         this.userRepository = userRepository;
         this.tokenService = tokenService;
+        this.emailService = emailService;
     }
     registration({ name, email, password }) {
         return __awaiter(this, void 0, void 0, function* () {
             const newUser = new user_entity_1.UserEntity(name, email);
-            debugger;
             const salt = this.configService.get('SALT');
             yield newUser.setPassword(password, Number(salt));
+            const activateLink = (0, uuid_1.v4)();
+            yield this.emailService.sendMailForActivation(email, `${this.configService.get('API_URL')}api/activate/${activateLink}`);
             const existUser = yield this.userRepository.find(email);
             debugger;
             if (existUser) {
@@ -47,7 +51,7 @@ let UserService = class UserService {
                 const createdUser = yield this.userRepository.create(newUser);
                 const tokens = this.tokenService.generateToken(newUser);
                 yield this.tokenService.saveToken(createdUser.id, tokens.refreshToken);
-                return Object.assign(Object.assign({}, tokens), { user: newUser });
+                return { tokens, user: createdUser };
             }
         });
     }
@@ -56,7 +60,7 @@ let UserService = class UserService {
             const user = yield this.userRepository.find(email);
             if (!user)
                 return null;
-            const newUser = new user_entity_1.UserEntity(user.email, user.name, user.password);
+            const newUser = new user_entity_1.UserEntity(user.name, user.email, user._id, user.password);
             const result = yield newUser.comparePassword(password);
             if (!result)
                 return null;
@@ -71,13 +75,34 @@ let UserService = class UserService {
             return token;
         });
     }
-    activate(link) {
+    refreshToken(refreshToken) {
         return __awaiter(this, void 0, void 0, function* () {
-            return true;
+            if (!refreshToken) {
+                throw new http_error_1.HttpError(401, 'Unauthorized');
+            }
+            const userData = this.tokenService.validateRefreshToken(refreshToken);
+            const tokenFromDb = yield this.tokenService.findToken(refreshToken);
+            if (!userData || !tokenFromDb) {
+                throw new http_error_1.HttpError(401, 'Unauthorized');
+            }
+            const user = yield this.userRepository.find(userData.email);
+            if (!user) {
+                return null;
+            }
+            const newUser = new user_entity_1.UserEntity(user.name, user.email, user.id);
+            const tokens = this.tokenService.generateToken(newUser);
+            yield this.tokenService.saveToken(newUser.id, tokens.refreshToken);
+            return Object.assign(Object.assign({}, tokens), { user: newUser });
         });
     }
-    refresh() {
+    activate(activateLink) {
         return __awaiter(this, void 0, void 0, function* () {
+            const user = yield this.userRepository.findLink(activateLink);
+            if (!user) {
+                throw new http_error_1.HttpError(400, 'Error while trying to activate');
+            }
+            user.isActivated = true;
+            yield user.save();
         });
     }
 };
@@ -86,7 +111,8 @@ UserService = __decorate([
     __param(0, (0, inversify_1.inject)(types_1.TYPES.ConfigService)),
     __param(1, (0, inversify_1.inject)(types_1.TYPES.UserRepo)),
     __param(2, (0, inversify_1.inject)(types_1.TYPES.TokenService)),
-    __metadata("design:paramtypes", [Object, Object, Object])
+    __param(3, (0, inversify_1.inject)(types_1.TYPES.EmailService)),
+    __metadata("design:paramtypes", [Object, Object, Object, Object])
 ], UserService);
 exports.UserService = UserService;
 //# sourceMappingURL=user.service.js.map

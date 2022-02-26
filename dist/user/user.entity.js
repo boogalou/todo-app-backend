@@ -12,9 +12,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserEntity = void 0;
 const bcryptjs_1 = require("bcryptjs");
 class UserEntity {
-    constructor(_name, _email, passwordHash) {
+    constructor(_name, _email, _id, passwordHash) {
         this._name = _name;
         this._email = _email;
+        this._id = _id;
         if (passwordHash) {
             this._password = passwordHash;
         }
@@ -33,9 +34,6 @@ class UserEntity {
     }
     get isActivated() {
         return this._isActivated;
-    }
-    get refreshToken() {
-        return this._refreshToken;
     }
     setActivated() {
         this._isActivated = this._isActivated;

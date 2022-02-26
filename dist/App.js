@@ -27,27 +27,42 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.App = void 0;
 const express_1 = __importDefault(require("express"));
 const body_parser_1 = require("body-parser");
+const cookie_parser_1 = __importDefault(require("cookie-parser"));
 const inversify_1 = require("inversify");
 require("reflect-metadata");
 const types_1 = require("./types");
 const user_controller_1 = require("./user/user.controller");
 const database_service_1 = require("./Database/database.service");
 const config_service_1 = require("./config/config.service");
+const auth_middleware_1 = require("./common/auth.middleware");
+const todo_controller_1 = require("./todo/todo.controller");
+const cors_1 = __importDefault(require("cors"));
 let App = class App {
-    constructor(logger, exceptionFilter, userController, configService, databaseService) {
+    constructor(logger, exceptionFilter, userController, configService, databaseService, todoController) {
         this.logger = logger;
         this.exceptionFilter = exceptionFilter;
         this.userController = userController;
         this.configService = configService;
         this.databaseService = databaseService;
+        this.todoController = todoController;
         this.app = (0, express_1.default)();
         this.PORT = this.configService.get('PORT');
     }
     useMiddleware() {
+        this.app.use((0, cors_1.default)({
+            credentials: true,
+            origin: 'https://todo-react-app-pied.vercel.app'
+        }));
         this.app.use((0, body_parser_1.json)());
+        this.app.use((0, cookie_parser_1.default)());
+        const authMiddleware = new auth_middleware_1.AuthMiddleware(this.configService.get('JWT_ACCESS'));
+        this.app.use(authMiddleware.execute.bind(authMiddleware));
     }
     useRoutes() {
-        this.app.use('/', this.userController.router);
+        this.app.use('/api', [
+            this.userController.router,
+            this.todoController.router
+        ]);
     }
     useExceptionFilters() {
         this.app.use(this.exceptionFilter.catch.bind(this.exceptionFilter));
@@ -74,9 +89,11 @@ App = __decorate([
     __param(2, (0, inversify_1.inject)(types_1.TYPES.UserController)),
     __param(3, (0, inversify_1.inject)(types_1.TYPES.ConfigService)),
     __param(4, (0, inversify_1.inject)(types_1.TYPES.DatabaseService)),
+    __param(5, (0, inversify_1.inject)(types_1.TYPES.TodoController)),
     __metadata("design:paramtypes", [Object, Object, user_controller_1.UserController,
         config_service_1.ConfigService,
-        database_service_1.DatabaseService])
+        database_service_1.DatabaseService,
+        todo_controller_1.TodoController])
 ], App);
 exports.App = App;
 //# sourceMappingURL=App.js.map
