@@ -30,7 +30,7 @@ export class App {
     ) {
 
     this.app = express();
-    this.PORT = this.configService.get('PORT');
+    this.PORT = this.configService.get('PORT') || 7000;
   }
 
   useMiddleware(): void {
