@@ -64,7 +64,7 @@ export class App {
       this.useExceptionFilters();
       await this.databaseService.connect();
       this.server = this.app.listen(this.PORT, () =>
-        this.logger.log(`server was started on http://localhost:${this.PORT}`),
+        this.logger.log(`server was started on ${this.PORT}`),
       );
     } catch (err) {
       this.logger.error(err);
